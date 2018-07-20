@@ -3,11 +3,11 @@ MoodBook is an emotion dictionary based on the of eight basic emotions including
 ________________________________________________________________________________________________________________________________________
 
 # Description
-The MoodBook contains list of emotional words belonging to either one or many of the eight basic emotions along with two sentiment polarities (negative and positive). The emotion categories, namely fear, anger, sadness and disgust are associated with negative sentiments whereas joy, trust and anticipation categories fall under positive sentiments. However, surprise category holds the words of mixed sentiment (e.g. shocking represents negative emotion and amazing represents positive emotion). We used NRC Word-Emotion Lexicon (EmoLex) as a base to design our dictionary. 
+The MoodBook contains list of emotional words belonging to either one or many of the eight basic emotions along with two sentiment polarities (negative and positive). The emotion categories, namely fear, anger, sadness and disgust are associated with negative sentiments whereas joy, trust and anticipation categories fall under positive sentiments. However, surprise category holds the words of mixed sentiment (e.g. shocking represents negative emotion and amazing represents positive emotion). We used NRC Word-Emotion Lexicon (EmoLex) as a base to design our dictionary. The last two columns of the lexicon classifies all the words of the dictionary into two(positive and negative) classes. 
 
 
 
-# EXAMPLE (Examples of emotion words added to  MoodBook lexicon)
+EXAMPLE (Examples of emotion words added to  MoodBook lexicon)
 
 # Mood-Words	Mood-category	
 _____________________________
