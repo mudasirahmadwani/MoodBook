@@ -1,0 +1,176 @@
+from __future__ import division
+from nltk.corpus import stopwords
+import string
+import xlrd
+from nltk.tokenize import word_tokenize
+import re
+import sys
+import numpy
+
+file_location="location to MoodBook"
+
+workbook = xlrd.open_workbook(file_location)
+emo_dictionary = workbook.sheet_by_index(0)
+
+emoList=emo_dictionary.col_slice(0)
+fear = ([i for i in emoList if i.value!=""])
+emoList=emo_dictionary.col_slice(1)
+angry =([i for i in emoList if i.value!=""])
+emoList=emo_dictionary.col_slice(2)
+sad = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(3)
+joy = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(4)
+surprise = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(5)
+disgust = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(6)
+trust = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(7)
+anticipation = ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(8)
+positive= ([i for i in emoList if i.value!=''])
+emoList=emo_dictionary.col_slice(9)
+negative= ([i for i in emoList if i.value!=''])
+
+class Emotion:
+    def norml(self,str):
+
+        #str = unicode(str, errors='ignore')
+        str = str.lower();
+        tagRe = re.compile(r'\\x..')
+        str = tagRe.sub('', str)
+
+        stop_words = set(stopwords.words("english"))
+        words = word_tokenize(str)
+        nor_str = "";
+        punctuations = list(string.punctuation);
+        for w in words:
+            if w not in stop_words and w not in punctuations:
+                nor_str = nor_str + " " + w;
+        final_word = word_tokenize(nor_str)
+
+        return (final_word);
+
+    def matched_emotions(self,emolist,postToks):
+        #print emolist
+        words = []
+        #words = set()
+        for e in emolist:
+            if e.value != "":
+               for s in postToks:
+                   if (e.value == s):
+
+                   #if e.value in s:
+
+                        #print e.value+" hhhhhhhhh "+s
+                       words.append(s)
+                        #words.add(s)
+        #print(words)
+        return words;
+
+    def match_emotion2(self,cat,postToks):
+        emoWords = []
+        if(cat == "joy"):
+            emoWords = self.matched_emotions(joy, postToks)
+        elif (cat == "fear"):
+            emoWords = self.matched_emotions(fear, postToks)
+        elif (cat == "angry"):
+            emoWords = self.matched_emotions(angry, postToks)
+        elif (cat == "sad"):
+            emoWords = self.matched_emotions(sad, postToks)
+        elif (cat == "anticipation"):
+            emoWords = self.matched_emotions(anticipation, postToks)
+        elif (cat == "trust"):
+            emoWords = self.matched_emotions(trust, postToks)
+        return emoWords
+
+    def mood_vector2(self,postToks):
+        total_wor = []
+        #print fear
+        fear_wor = self.matched_emotions(fear,postToks)
+        angry_wor = self.matched_emotions(angry, postToks)
+        # print sad
+        sad_wor = self.matched_emotions(sad, postToks)
+        joy_wor = self.matched_emotions(joy, postToks)
+        surprise_wor = self.matched_emotions(surprise, postToks)
+        disgust_wor = self.matched_emotions(disgust, postToks)
+        trust_wor = self.matched_emotions(trust, postToks)
+        anti_wor = self.matched_emotions(anticipation, postToks)
+        total_wor = fear_wor + angry_wor + sad_wor + joy_wor + surprise_wor + disgust_wor + trust_wor + anti_wor
+        #total_wor = fear_wor | angry_wor | sad_wor | joy_wor | surprise_wor | disgust_wor | trust_wor | anti_wor
+        #print(total_wor)
+        total = total_wor.__len__()
+
+        positiveWor = self.matched_emotions(positive,postToks)
+        negativeWor = self.matched_emotions(negative,postToks)
+        totPosNeg = len(positiveWor + negativeWor)
+        #totPosNeg = len(positiveWor | negativeWor)
+        # print(a/total)
+        # print (j/total)
+        moodVector = [0, 0, 0, 0, 0, 0, 0, 0,0,0]
+
+        if total:
+            # print "hello"
+            moodVector[0] = len(fear_wor) / total
+            moodVector[1] = len(angry_wor) / total
+            moodVector[2] = len(sad_wor) / total
+            moodVector[3] = len(joy_wor) / total
+            moodVector[4] = len(surprise_wor) / total
+            moodVector[5] = len(disgust_wor) / total
+            moodVector[6] = len(trust_wor) / total
+            moodVector[7] = len(anti_wor) / total
+        if totPosNeg:
+            moodVector[8] = len(positiveWor)/totPosNeg
+            moodVector[9] = len(negativeWor)/totPosNeg
+        return moodVector
+
+    def mood_Statistics(self,postToks):
+        fear_wor = self.matched_emotions(fear, postToks)
+        angry_wor = self.matched_emotions(angry, postToks)
+        # print sad
+        sad_wor = self.matched_emotions(sad, postToks)
+        joy_wor = self.matched_emotions(joy, postToks)
+        surprise_wor = self.matched_emotions(surprise, postToks)
+        disgust_wor = self.matched_emotions(disgust, postToks)
+        trust_wor = self.matched_emotions(trust, postToks)
+        anti_wor = self.matched_emotions(anticipation, postToks)
+        moodStat = []
+        moodStat.append(len(fear_wor))
+        moodStat.append(len(angry_wor))
+        moodStat.append(len(sad_wor))
+        moodStat.append(len(joy_wor))
+        moodStat.append(len(surprise_wor))
+        moodStat.append(len(disgust_wor))
+        moodStat.append(len(trust_wor))
+        moodStat.append(len(anti_wor))
+
+        return(moodStat)
+
+    def mood_max(self,postToks):
+        max_index = 0
+        moodStat = self.mood_Statistics(postToks)
+        maxMood = max(moodStat)
+        if (maxMood):
+            max_index = [i + 1 for i, j in enumerate(moodStat) if j == maxMood]
+        # max_index = moodStat.index(max(moodStat))
+        return (max_index)
+
+    def emotionVariance(self,content):
+        posts = content.split("$$$$$")
+       #print(len(posts))
+        del posts[0]
+        postMoodList = []
+        for _ in range(len(posts)):
+
+            postMood = self.mood_max(self.norml(posts[_]))
+
+            if (postMood):
+                for i2 in postMood:
+                    postMoodList.append(i2)
+        #print(postMoodList)
+        if (postMoodList):
+            postVar = (numpy.var(postMoodList))
+        else:
+            postVar = 0
+        return postVar
